@@ -643,7 +643,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     plt.ylabel('Nombre des individues')
     plt.title("infected in the whole popularity")
     plt.grid(True)
-    plt.savefig(title_fig+'infected.pdf',dpi=50)
+    plt.savefig(title_fig+'infectedInWholePopularity.pdf',dpi=50)
     #Infected yt
     xx+=1
     plt.figure(num=xx)
@@ -716,7 +716,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     plt.title("Spreaders of the whole popularity")
     plt.xlabel('Temps')
     plt.ylabel('Nombre des individues')
-    plt.savefig(title_fig+'Spreaders.pdf',dpi=20)
+    plt.savefig(title_fig+'SpreadersInWholePopularity.pdf',dpi=20)
     #Spreaders yt
     xx+=1
     plt.figure(num=xx)
@@ -780,7 +780,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     plt.ylabel('Nombre des individues')
     plt.grid(True)
     plt.title("Global Rumor Popularity")
-    plt.savefig(title_fig+'RumorPopularity.pdf',dpi=20)
+    plt.savefig(title_fig+'RumorPopularityInWholePopularity.pdf',dpi=20)
     #RumorPopularity yt
     xx+=1
     plt.figure(num=xx)

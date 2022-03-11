@@ -18,14 +18,13 @@ def Neighbour_finder(g,new_active):
 def MyUnion(lst1, lst2):
     final_list = list(set(lst1) | set(lst2))
     return final_list
-def HISBmodel (Graph,graphTypeIndice,allNodesInfected,allNodesSpreaders,GlobalRumorPopularity,Seed_Set,Opinion_Set,Statistical,paramater,K,timeOfTheRumorDetection,method):
+def HISBmodel (Graph,graphTypeIndice,allNodesInfected,GlobalRumorPopularity,Seed_Set,Opinion_Set,Statistical,paramater,K,timeOfTheRumorDetection,method):
     
     #Opinion:normal/denying/supporting
     #State:non_infected/infected/spreaders 
     #Statistical:{'NonInfected':NbrOFnodes,'Infected':**,'Spreaders':**,OpinionDenying':**,'OpinionSupporting':**,'RumorPopularity':**}
     bl=0
     ListInfectedNodes=Seed_Set[:]
-    listSpreaders=[]
     Opinion_Set=Opinion_Set[:]
     time=0.125
     Probability=1
@@ -48,9 +47,7 @@ def HISBmodel (Graph,graphTypeIndice,allNodesInfected,allNodesSpreaders,GlobalRu
       if each!=0:
         Graph.nodes[each]['Infetime']=0.125 
         Graph.nodes[each]['state']='spreaders'
-        listSpreaders.append(each)
         Graph.nodes[each]['AccpR']+=1
-        
         RumorPopularity+=Graph.nodes[each]['degree'][layerIndice]
         Nbr_Infected+=1
         Nbr_nonInfected-=1
@@ -68,7 +65,7 @@ def HISBmodel (Graph,graphTypeIndice,allNodesInfected,allNodesSpreaders,GlobalRu
         
     
     #------------------------------
-    Statistical.append({'NonInfected':Nbr_nonInfected,'Infected':Nbr_Infected,'graphTypeIndice':graphTypeIndice, 'AllInfected':len(allNodesInfected), 'allSpreaders':len(allNodesSpreaders), 'Spreaders':Nbr_Spreaders,'OpinionDenying':OpinionDenying,'OpinionSupporting':OpinionSupporting,'RumorPopularity':RumorPopularity,'GlobalRumorPopularity':GlobalRumorPopularity,'graph':0})
+    Statistical.append({'NonInfected':Nbr_nonInfected,'Infected':Nbr_Infected,'graphTypeIndice':graphTypeIndice, 'AllInfected':len(allNodesInfected), 'Spreaders':Nbr_Spreaders,'OpinionDenying':OpinionDenying,'OpinionSupporting':OpinionSupporting,'RumorPopularity':RumorPopularity,'GlobalRumorPopularity':GlobalRumorPopularity,'graph':0})
     #----------------------
 
     #if the list is empty we stop the propagation
@@ -78,18 +75,9 @@ def HISBmodel (Graph,graphTypeIndice,allNodesInfected,allNodesSpreaders,GlobalRu
       for node in allNodesInfected:
         if not node in ListInfectedNodes:
           ListInfectedNodes.append(node)
-      #add spreaders coming from the other networks
-      for node in allNodesSpreaders:
-        if not node in listSpreaders:
-          listSpreaders.append(node)
-    #   #delete no spreaders fromm spreaders list:
-    #   for n in listSpreaders:
-    #     if Graph.nodes[n-1]['state'] != 'spreaders':
-    #       listSpreaders.remove(n)
       RumorPopularity = 0
       Nbr_Spreaders = 0
       L=len(ListInfectedNodes)
-      #print(L)
       for X in reversed(range(0,L)):
         
         id = ListInfectedNodes[X]
@@ -117,7 +105,6 @@ def HISBmodel (Graph,graphTypeIndice,allNodesInfected,allNodesSpreaders,GlobalRu
             if (c<=ActualAttraction * probSpreadingInThisLayer):
             #if (c<=ActualAttraction):  # yes the current node will speard the rumor
                 Nbr_Spreaders+=1
-                listSpreaders.append(id)
                 Graph.nodes[id]['state']='spreaders'
                 
                 #Calculating if any nodes of those neighbours can be activated, if yes add them to new_ones.
@@ -169,16 +156,10 @@ def HISBmodel (Graph,graphTypeIndice,allNodesInfected,allNodesSpreaders,GlobalRu
                     OpinionDenying+=1       
       
       #save each step to send it to viewing later
-      #print("before:", len(allNodesInfected))
-      Statistical.append({'NonInfected':Nbr_nonInfected,'Infected':Nbr_Infected, 'AllInfected':len(allNodesInfected), 'allSpreaders':len(allNodesSpreaders), 'Spreaders':Nbr_Spreaders,'OpinionDenying':OpinionDenying,'OpinionSupporting':OpinionSupporting,'RumorPopularity':RumorPopularity,'GlobalRumorPopularity':GlobalRumorPopularity,'graph':0})
+      Statistical.append({'NonInfected':Nbr_nonInfected,'Infected':Nbr_Infected, 'AllInfected':len(allNodesInfected), 'Spreaders':Nbr_Spreaders,'OpinionDenying':OpinionDenying,'OpinionSupporting':OpinionSupporting,'RumorPopularity':RumorPopularity,'GlobalRumorPopularity':GlobalRumorPopularity,'graph':0})
       
       allNodesInfected = allNodesInfected.union(ListInfectedNodes)
-      allNodesSpreaders = allNodesSpreaders.union(listSpreaders)
-      #delete no spreaders fromm spreaders list:
-      for n in listSpreaders:
-        if Graph.nodes[n]['state'] != 'spreaders':
-          listSpreaders.remove(n)
-      #print("after:", len(allNodesInfected))
+      
       if time >=timeOfTheRumorDetection*0.125 and bl<K  and method != 'NP' :     #############################
           print(method," At time:", time, "blocked nodes Nbr:", bl)
           #Nodes=len(Graph.nodes)
@@ -322,7 +303,7 @@ def parameters(parameter,stepBeta=1,Beta=0.2,stepOmega=5.2,Omega=math.pi/3,stepD
     Delta_max=Delta +stepDelta
     Jug_max=Jug+stepJug
     parameter.append({'beta_min':round(Beta,2),'beta_max':round(Beta_max,2),'omega_min':round(Omega,2),'omega_max':round(Omega_max,2),'delta_min':round(Delta,2),'delta_max':round(Delta_max,2),'Jug_min':round(Jug,2),'Jug_max':round(Jug_max,2)})
-def Start(i,Graph,allNodesInfected,allNodesSpreaders,GlobalRumorPopularity,parameter,Stat,percentage,K,timeOfTheRumorDetection,method):
+def Start(i,Graph,allNodesInfected,GlobalRumorPopularity,parameter,Stat,percentage,K,timeOfTheRumorDetection,method):
     print("The ", int(i/3)+1, "th simulation")
     for each in range(1, len(Graph.nodes)+1):
         Graph.nodes[each]['opinion']="normal"
@@ -336,18 +317,18 @@ def Start(i,Graph,allNodesInfected,allNodesSpreaders,GlobalRumorPopularity,param
     Listopinion=[]
     if i%3==0:
       allNodesInfected=set()
-      allNodesSpreaders=set()
+
       GlobalRumorPopularity=0
     #X% of Popularity is infected 
     geneList_Infectede(ListInfected,Listopinion,6407,percentage)
     for n in ListInfected:
       allNodesInfected.add(n)
    
-    HISBmodel(Graph,i,allNodesInfected,allNodesSpreaders,GlobalRumorPopularity,ListInfected,Listopinion,Statistical,parameter,K,timeOfTheRumorDetection,method)  
+    HISBmodel(Graph,i,allNodesInfected,GlobalRumorPopularity,ListInfected,Listopinion,Statistical,parameter,K,timeOfTheRumorDetection,method)  
     Stat.append(Statistical)    
     
     
-def globalStat(S,Stat_Global,parameter,method):
+def globalStat(S,Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,parameter,method):
     max=0
     Stat=[]
     for each in S:
@@ -366,10 +347,9 @@ def globalStat(S,Stat_Global,parameter,method):
         RumorPopularity=Stat[i][L-1]['RumorPopularity']
         GlobalRumorPopularity=Stat[i][L-1]['GlobalRumorPopularity']
         AllInfected=Stat[i][L-1]['AllInfected']
-        allSpreaders=Stat[i][L-1]['allSpreaders']
 
         for j in range(L,max):
-            Stat[i].append({'NonInfected':Nbr_nonInfected,'Infected':Nbr_Infected,'AllInfected':AllInfected, 'allSpreaders':allSpreaders, 'Spreaders':Nbr_Spreaders,'OpinionDenying':OpinionDenying,'OpinionSupporting':OpinionSupporting,'RumorPopularity':RumorPopularity,'GlobalRumorPopularity':GlobalRumorPopularity,'graph':0})       
+            Stat[i].append({'NonInfected':Nbr_nonInfected,'Infected':Nbr_Infected,'AllInfected':AllInfected, 'Spreaders':Nbr_Spreaders,'OpinionDenying':OpinionDenying,'OpinionSupporting':OpinionSupporting,'RumorPopularity':RumorPopularity,'GlobalRumorPopularity':GlobalRumorPopularity,'graph':0})       
 
     y1=[]
     y2=[]
@@ -377,8 +357,10 @@ def globalStat(S,Stat_Global,parameter,method):
     y4=[]
     y5=[]
     y6=[]
-    y7=[]
     y8=[]
+    z=list()
+    for i in range(3):
+      z.append([list(),list(),list()])
     Len=len(Stat)
   
     for i in range(max):
@@ -390,8 +372,13 @@ def globalStat(S,Stat_Global,parameter,method):
         OpinionDenying=0
         OpinionSupporting=0
         AllInfected=0
-        allSpreaders=0
-        for each in Stat:           
+        infectedInNetworks=[0]*3
+        spreadersINetworks=[0]*3
+        RPopularityINetworks=[0]*3
+        counter=0
+        print("number of simulations: ", len(Stat))
+        for each in Stat: 
+            counter+=1          
             Infected+=(each[i]['Infected'])
             Spreaders+=(each[i]['Spreaders'])
             RumorPopularity+=(each[i]['RumorPopularity'])
@@ -399,7 +386,12 @@ def globalStat(S,Stat_Global,parameter,method):
             OpinionDenying+=(each[i]['OpinionDenying'])
             OpinionSupporting+=(each[i]['OpinionSupporting'])
             AllInfected+=(each[i]['AllInfected'])
-            allSpreaders+=(each[i]['allSpreaders'])
+            for j in range(3):
+              if counter % 3 == j:
+                infectedInNetworks[j]+=(each[i]['Infected'])
+                spreadersINetworks[j]+=(each[i]['Spreaders'])
+                print("thiiiiiiiiiiiiiiiiiiiiiiis spreaders: ", each[i]['Spreaders'])
+                RPopularityINetworks[j]+=(each[i]['RumorPopularity'])
         y1.append(Infected/Len)
         y2.append(Spreaders/Len)
         y3.append(RumorPopularity/Len)
@@ -407,12 +399,19 @@ def globalStat(S,Stat_Global,parameter,method):
         y4.append(OpinionDenying/Len)
         y5.append(OpinionSupporting/Len)
         y6.append(AllInfected/Len)
-        y7.append(allSpreaders/Len)
-     
+        #the first list in Z contrain the lists of infected, spreaders and RumorPopularity of youtube, the second for twitter...
+        for j in range(3):
+                z[j][0].append(infectedInNetworks[j]/int(Len/3))
+                z[j][1].append(spreadersINetworks[j]/int(Len/3))
+                z[j][2].append(RPopularityINetworks[j]/int(Len/3))
+        
+    GlobalStatYt.append({'Infected':z[1][0],'Spreaders':z[1][1],'RumorPopularity':z[1][2],'max':max,'method':method})
+    GlobalStatTw.append({'Infected':z[0][0],'Spreaders':z[0][1],'RumorPopularity':z[0][2],'max':max,'method':method})
+    GlobalStatFf.append({'Infected':z[2][0],'Spreaders':z[2][1],'RumorPopularity':z[2][2],'max':max,'method':method})
+    Stat_Global.append({'Infected':y1,'Spreaders':y2,'RumorPopularity':y3,'GlobalRumorPopularity':y8,'OpinionDenying':y4,'OpinionSupporting':y5, 'AllInfected':y6, 'parameter':parameter,'max':max,'method':method})       
+    
 
-    Stat_Global.append({'Infected':y1,'Spreaders':y2,'RumorPopularity':y3,'GlobalRumorPopularity':y8,'OpinionDenying':y4,'OpinionSupporting':y5, 'AllInfected':y6, 'allSpreaders':y7, 'parameter':parameter,'max':max,'method':method})       
-    #Number of nodes
-def Display(Stat_Global,xx,title_fig,nb):
+def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     print("Stat_Global  : ", Stat_Global)
     Title=['NP']
     max=0
@@ -421,8 +420,7 @@ def Display(Stat_Global,xx,title_fig,nb):
     para=[]
     for each in Stat_Global:
         L=each['max']   #It's the bigger number of observations of the done simulations
-        #print(L,each['Infected'])
-        print("L:  ", L)
+        
         para.append(each['method'])
         metho=str(each['method'])
         if metho.startswith('TCS'):
@@ -444,7 +442,6 @@ def Display(Stat_Global,xx,title_fig,nb):
             RumorPopularity=each['RumorPopularity'][L-1]
             GlobalRumorPopularity=each['GlobalRumorPopularity'][L-1]
             allNodesInfected=each['AllInfected'][L-1]
-            allNodesSpreaders=each['allSpreaders'][L-1]
             for j in range(L,max):
                 each['Infected'].append(Nbr_Infected)
                 each['Spreaders'].append(Nbr_Spreaders)
@@ -453,10 +450,8 @@ def Display(Stat_Global,xx,title_fig,nb):
                 each['RumorPopularity'].append(RumorPopularity)
                 each['GlobalRumorPopularity'].append(GlobalRumorPopularity)
                 each['AllInfected'].append(allNodesInfected)
-                each['allSpreaders'].append(allNodesSpreaders)
-    
+
     pro=int(max/50)
-    print("maxxxxxx:",max)
     if max%2 == 1:
       max-=1
     for each in Stat:
@@ -470,7 +465,6 @@ def Display(Stat_Global,xx,title_fig,nb):
                     each['RumorPopularity'].pop(j)
                     each['GlobalRumorPopularity'].pop(j)
                     each['AllInfected'].pop(j)
-                    each['allSpreaders'].pop(j)
 
     for each in Stat:
             for j in reversed(range(10)):
@@ -481,11 +475,154 @@ def Display(Stat_Global,xx,title_fig,nb):
                     each['RumorPopularity'].pop(20+j)
                     each['GlobalRumorPopularity'].pop(20+j)
                     each['AllInfected'].pop(20+j)
-                    each['allSpreaders'].pop(20+j)
     x = range(0,len(Stat[0]['AllInfected']))
     x=np.array(x)*pro
-    
+    #for the yt,tw and ff: ------------------------------------------------------------
+    #for yt
+    maxyt=0
+    StatYt=[]
+    InfectedYt=[]
+    paraYt=[]
 
+    for each in GlobalStatYt:
+        L=each['max']   #It's the bigger number of observations of the done simulations
+        paraYt.append(each['method'])
+        metho=str(each['method'])
+        if metho.startswith('TCS'):
+            InfectedYt.append(each['OpinionSupporting'][L-1]/Nodes)
+        else:
+            InfectedYt.append(each['Infected'][L-1]/Nodes)
+                
+        
+        StatYt.append(each)
+
+        if(L>maxyt):
+            maxyt=L
+    for each in StatYt:
+        L=each['max']
+        if (L<maxyt):
+            Nbr_Infected=each['Infected'][L-1]
+            Nbr_Spreaders=each['Spreaders'][L-1]
+            RumorPopularity=each['RumorPopularity'][L-1]
+            for j in range(L,maxyt):
+                each['Infected'].append(Nbr_Infected)
+                each['Spreaders'].append(Nbr_Spreaders)
+                each['RumorPopularity'].append(RumorPopularity)
+    
+    proYt=int(maxyt/50)
+    if maxyt%2 == 1:
+      maxyt-=1
+    for each in StatYt:
+            for j in reversed(range(maxyt)):
+                d=j%proYt
+                if(d!=0):
+                    each['Infected'].pop(j)
+                    each['Spreaders'].pop(j)
+                    each['RumorPopularity'].pop(j)
+
+    for each in StatYt:
+            for j in reversed(range(10)):
+                    each['Infected'].pop(20+j)
+                    each['Spreaders'].pop(20+j)
+                    each['RumorPopularity'].pop(20+j)
+    xYt = range(0,len(StatYt[0]['Infected']))
+    xYt=np.array(x)*proYt
+    ##########
+    #for tw
+    maxTw=0
+    StatTw=[]
+    InfectedTw=[]
+    paraTw=[]
+    for each in GlobalStatTw:
+        L=each['max']   #It's the bigger number of observations of the done simulations
+        paraTw.append(each['method'])
+        metho=str(each['method'])
+        if metho.startswith('TCS'):
+            InfectedTw.append(each['OpinionSupporting'][L-1]/Nodes)
+        else:
+            InfectedTw.append(each['Infected'][L-1]/Nodes)
+                
+        
+        StatTw.append(each)
+        if(L>maxTw):
+            maxTw=L
+    for each in StatTw:
+        L=each['max']
+        if (L<maxTw):
+            Nbr_Infected=each['Infected'][L-1]
+            Nbr_Spreaders=each['Spreaders'][L-1]
+            RumorPopularity=each['RumorPopularity'][L-1]
+            for j in range(L,maxTw):
+                each['Infected'].append(Nbr_Infected)
+                each['Spreaders'].append(Nbr_Spreaders)
+                each['RumorPopularity'].append(RumorPopularity)
+    
+    proTw=int(maxTw/50)
+    if maxTw%2 == 1:
+      maxTw-=1
+    for each in StatTw:
+            for j in reversed(range(maxTw)):
+                d=j%proTw
+                if(d!=0):
+                    each['Infected'].pop(j)
+                    each['Spreaders'].pop(j)
+                    each['RumorPopularity'].pop(j)
+
+    for each in StatTw:
+            for j in reversed(range(10)):
+                    each['Infected'].pop(20+j)
+                    each['Spreaders'].pop(20+j)
+                    each['RumorPopularity'].pop(20+j)
+    xTw = range(0,len(StatTw[0]['Infected']))
+    xTw=np.array(x)*proTw
+    #######
+    #for Ff
+    maxFf=0
+    StatFf=[]
+    InfectedFf=[]
+    paraFf=[]
+    for each in GlobalStatFf:
+        L=each['max']   #It's the bigger number of observations of the done simulations
+        paraFf.append(each['method'])
+        metho=str(each['method'])
+        if metho.startswith('TCS'):
+            InfectedFf.append(each['OpinionSupporting'][L-1]/Nodes)
+        else:
+            InfectedFf.append(each['Infected'][L-1]/Nodes)
+                
+        
+        StatFf.append(each)
+        if(L>maxFf):
+            maxFf=L
+    for each in StatFf:
+        L=each['max']
+        if (L<maxFf):
+            Nbr_Infected=each['Infected'][L-1]
+            Nbr_Spreaders=each['Spreaders'][L-1]
+            RumorPopularity=each['RumorPopularity'][L-1]
+            for j in range(L,maxFf):
+                each['Infected'].append(Nbr_Infected)
+                each['Spreaders'].append(Nbr_Spreaders)
+                each['RumorPopularity'].append(RumorPopularity)
+    
+    proFf=int(maxFf/50)
+    if maxFf%2 == 1:
+      maxFf-=1
+    for each in StatFf:
+            for j in reversed(range(maxFf)):
+                d=j%proFf
+                if(d!=0):
+                    each['Infected'].pop(j)
+                    each['Spreaders'].pop(j)
+                    each['RumorPopularity'].pop(j)
+
+    for each in StatFf:
+            for j in reversed(range(10)):
+                    each['Infected'].pop(20+j)
+                    each['Spreaders'].pop(20+j)
+                    each['RumorPopularity'].pop(20+j)
+    xFf = range(0,len(StatFf[0]['Infected']))
+    xFf=np.array(x)*proFf
     # plot 
     
     type=['x','*','p','8','h','H','.','+','4','1','2','3']
@@ -507,37 +644,20 @@ def Display(Stat_Global,xx,title_fig,nb):
     plt.title("infected in the whole popularity")
     plt.grid(True)
     plt.savefig(title_fig+'infected.pdf',dpi=50)
-    #Infected
-    xx+=1
-    plt.figure(num=xx)
-    plt.subplot()
-    #k="{}:{},{}]" 
-    k="{}" 
-    for infected,j in zip( Stat,range(len(Stat))):
-      quotients = [number /Nodes  for number in infected["Infected"]]
-      plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,label=k.format(Title[j]))
-    plt.legend(fontsize=12)   
-
-    plt.xlabel('Temps',fontsize=10)
-    plt.ylabel('Nombre des individues')
-    plt.title("infected node average rate in a single network")
-    plt.grid(True)
-    plt.savefig(title_fig+'infected.pdf',dpi=50)
-    '''
     #Infected yt
     xx+=1
     plt.figure(num=xx)
     plt.subplot()
     #k="{}:{},{}]" 
     k="{}" 
-    for infected,j in zip( Stat,range(len(Stat))):
-        if j%3==0:
-            quotients = [number /len(ytGraph.nodes())  for number in infected["Infected"]]
-            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,label=k.format(Title2[j]))
+    for infected,j in zip( StatYt,range(len(StatYt))):
+            quotients = [number /663  for number in infected["Infected"]]
+            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="red",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
     plt.xlabel('Temps',fontsize=10)
     plt.ylabel('Nombre des individues')
+    plt.title("infected in youtube")
     plt.grid(True)
     plt.savefig(title_fig+'infectedYoutube.pdf',dpi=50)
     #Infected tw
@@ -546,33 +666,33 @@ def Display(Stat_Global,xx,title_fig,nb):
     plt.subplot()
     #k="{}:{},{}]" 
     k="{}" 
-    for infected,j in zip( Stat,range(len(Stat))):
-        if j%3==1:
-            quotients = [number /len(twGraph.nodes())  for number in infected["Infected"]]
-            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,label=k.format(Title2[j]))
+    for infected,j in zip( StatTw,range(len(StatTw))):
+            quotients = [number /5540  for number in infected["Infected"]]
+            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="blue",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
     plt.xlabel('Temps',fontsize=10)
     plt.ylabel('Nombre des individues')
+    plt.title("infected in twitter")
     plt.grid(True)
-    plt.savefig(title_fig+'infectedYoutube.pdf',dpi=50)
+    plt.savefig(title_fig+'infectedTwitter.pdf',dpi=50)
     #Infected ff
+    xx+=1
     plt.figure(num=xx)
     plt.subplot()
     #k="{}:{},{}]" 
     k="{}" 
-    for infected,j in zip( Stat,range(len(Stat))):
-        if j%3==2:
-            quotients = [number /len(ffGraph.nodes())  for number in infected["Infected"]]
-            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,label=k.format(Title2[j]))
+    for infected,j in zip( StatFf,range(len(StatFf))):
+            quotients = [number /5702  for number in infected["Infected"]]
+            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="green",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
     plt.xlabel('Temps',fontsize=10)
     plt.ylabel('Nombre des individues')
-    plt.title("infected in the networks")
+    plt.title("infected in Friendfeed")
     plt.grid(True)
-    plt.savefig(title_fig+'infectedInNetworks.pdf',dpi=50)
-    '''
+    plt.savefig(title_fig+'infectedInFriendfeed.pdf',dpi=50)
+    
     ###################################################################################
      #All Spreaders
     x = range(0,len(Stat[0]['Infected']))
@@ -597,22 +717,54 @@ def Display(Stat_Global,xx,title_fig,nb):
     plt.xlabel('Temps')
     plt.ylabel('Nombre des individues')
     plt.savefig(title_fig+'Spreaders.pdf',dpi=20)
-    #Spreaders
+    #Spreaders yt
     xx+=1
     plt.figure(num=xx)
     plt.subplot()
     #k="{}:{},{}]" 
     k="{}" 
-    for infected ,j in zip( Stat,range(len(Stat))):
-      quotients = [number /Nodes  for number in infected["Spreaders"]]
-      plt.plot(x, quotients,marker=type[j],markersize=6,linewidth=1,label=k.format(Title[j]))
-    
-    plt.legend(fontsize=12)
-    plt.grid(True)
-    plt.title("Spreaders average rate in a single network")
-    plt.xlabel('Temps')
+    for Spreaders,j in zip( StatYt,range(len(StatYt))):
+            quotients = [number /663  for number in Spreaders["Spreaders"]]
+            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="red",label=k.format(Title[j]))
+    plt.legend(fontsize=12)   
+
+    plt.xlabel('Temps',fontsize=10)
     plt.ylabel('Nombre des individues')
-    plt.savefig(title_fig+'Spreaders.pdf',dpi=20)
+    plt.title("Spreaders in youtube")
+    plt.grid(True)
+    plt.savefig(title_fig+'SpreadersYoutube.pdf',dpi=50)
+    #Spreaders tw
+    xx+=1
+    plt.figure(num=xx)
+    plt.subplot()
+    #k="{}:{},{}]" 
+    k="{}" 
+    for Spreaders,j in zip( StatTw,range(len(StatTw))):
+            quotients = [number /5540  for number in Spreaders["Spreaders"]]
+            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="blue",label=k.format(Title[j]))
+    plt.legend(fontsize=12)   
+
+    plt.xlabel('Temps',fontsize=10)
+    plt.ylabel('Nombre des individues')
+    plt.title("Spreaders in twitter")
+    plt.grid(True)
+    plt.savefig(title_fig+'SpreadersTwitter.pdf',dpi=50)
+    #Spreaders ff
+    xx+=1
+    plt.figure(num=xx)
+    plt.subplot()
+    #k="{}:{},{}]" 
+    k="{}" 
+    for Spreaders,j in zip( StatFf,range(len(StatFf))):
+            quotients = [number /5702  for number in Spreaders["Spreaders"]]
+            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="green",label=k.format(Title[j]))
+    plt.legend(fontsize=12)   
+
+    plt.xlabel('Temps',fontsize=10)
+    plt.ylabel('Nombre des individues')
+    plt.title("Spreaders in Friendfeed")
+    plt.grid(True)
+    plt.savefig(title_fig+'SpreadersInFriendfeed.pdf',dpi=50)
     ##################################################################################
     # Global RumorPopularity
     xx+=1
@@ -629,74 +781,58 @@ def Display(Stat_Global,xx,title_fig,nb):
     plt.grid(True)
     plt.title("Global Rumor Popularity")
     plt.savefig(title_fig+'RumorPopularity.pdf',dpi=20)
-    # RumorPopularity
+    #RumorPopularity yt
     xx+=1
     plt.figure(num=xx)
     plt.subplot()
     #k="{}:{},{}]" 
     k="{}" 
-    for infected,j in zip( Stat,range(len(Stat))):
-      quotients = [number /Nodes  for number in infected["RumorPopularity"]]
-      plt.plot(x, quotients,marker=type[j],markersize=6,linewidth=1,label=k.format(Title[j]))
-    plt.legend(fontsize=12) 
-    plt.xlabel('Temps')
-    plt.ylabel('Nombre des individues')
-    plt.grid(True)
-    plt.title("popularity")
-    plt.savefig(title_fig+'RumorPopularity.pdf',dpi=20)
-    ###################################################################################
-    
-    
-   
-    
-   # OpinionD
-    xx+=1
-    plt.figure(num=xx)
-    plt.subplot()
-    #k="{}:{},{}]" 
-    k="{}" 
-    for infected,j in zip( Stat,range(len(Stat))):
-      quotients = [number /Nodes  for number in infected["OpinionDenying"]]
-      
-      plt.plot(x, quotients,marker=type[j],markersize=6,linewidth=2,label=k.format(Title[j]))
-    plt.legend(fontsize=12) 
-    plt.grid(True)
-    plt.xlabel('Temps')
-    plt.ylabel('Nombre des individues')
-    plt.title("Denying")
-    plt.savefig(title_fig+'OpinionDenying.pdf',dpi=20)
-    
+    for RumorPopularity,j in zip( StatYt,range(len(StatYt))):
+            quotients = [number /663  for number in RumorPopularity["RumorPopularity"]]
+            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="red",label=k.format(Title[j]))
+    plt.legend(fontsize=12)   
 
-    # OpinionS
+    plt.xlabel('Temps',fontsize=10)
+    plt.ylabel('Nombre des individues')
+    plt.title("RumorPopularity in youtube")
+    plt.grid(True)
+    plt.savefig(title_fig+'RumorPopularityYoutube.pdf',dpi=50)
+    #RumorPopularity tw
     xx+=1
     plt.figure(num=xx)
     plt.subplot()
     #k="{}:{},{}]" 
     k="{}" 
-    for infected,j in zip( Stat,range(len(Stat))):
-      quotients = [number /Nodes  for number in infected["OpinionSupporting"]]
-      plt.plot(x, quotients,marker=type[j],markersize=6,linewidth=2,label=k.format(Title[j]))
-   
-    plt.legend(fontsize=12) 
-    plt.grid(True)
-    plt.xlabel('Temps')
+    for RumorPopularity,j in zip( StatTw,range(len(StatTw))):
+            quotients = [number /5540 for number in RumorPopularity["RumorPopularity"]]
+            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="blue",label=k.format(Title[j]))
+    plt.legend(fontsize=12)   
+
+    plt.xlabel('Temps',fontsize=10)
     plt.ylabel('Nombre des individues')
-    plt.title("Supporting")
-    plt.savefig(title_fig+'OpinionSupporting.pdf',dpi=20)
-    
+    plt.title("RumorPopularity in twitter")
+    plt.grid(True)
+    plt.savefig(title_fig+'RumorPopularityTwitter.pdf',dpi=50)
+    #RumorPopularity ff
+    xx+=1
+    plt.figure(num=xx)
+    plt.subplot()
+    #k="{}:{},{}]" 
+    k="{}" 
+    for RumorPopularity,j in zip( StatFf,range(len(StatFf))):
+            quotients = [number /5702  for number in RumorPopularity["RumorPopularity"]]
+            plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="green",label=k.format(Title[j]))
+    plt.legend(fontsize=12)   
+
+    plt.xlabel('Temps',fontsize=10)
+    plt.ylabel('Nombre des individues')
+    plt.title("RumorPopularity in Friendfeed")
+    plt.grid(True)
+    plt.savefig(title_fig+'RumorPopularityInFriendfeed.pdf',dpi=50)
+    ###################################################################################
     # Format the minor tick labels of the y-axis into empty strings with
     # `NullFormatter`, to avoid cumbering the axis with too many labels.
-'''
-    xx+=1
-    plt.figure(num=xx) 
-    plt.subplot()      
-    plt.plot(para,Infected,'bo')
-    plt.grid(True)
-    plt.xlabel(Title)
-    plt.title("infected")
-    plt.ylabel('Nombre des individues')
-    plt.savefig(title_fig+'nodes.pdf',dpi=20) 
-'''    
+   
 def Simulation(index,graph,Stat_Global,percentage):
      Beta=0.2
      with Manager() as manager:
@@ -765,12 +901,16 @@ def neighbor(Spreaders,g):
               
    
     return neighb,MaxD,Cente,beta,betaD
-def simulation_strategy(x,K,timeOfTheRumorDetection,method,G):
+def simulation_strategy(x,K,timeOfTheRumorDetection,method,G,numberOfNetworks):
     allNodesInfected = set()
-    allNodesSpreaders = set()
     GlobalRumorPopularity=0
+    #for each network in the multiplex
+        
     with Manager() as manager:
-        Stat_Global=manager.list() 
+        Stat_Global=manager.list()
+        GlobalStatYt=manager.list()
+        GlobalStatTw=manager.list()
+        GlobalStatFf=manager.list()
         v=0
         for met in method :
             print(met)
@@ -779,15 +919,15 @@ def simulation_strategy(x,K,timeOfTheRumorDetection,method,G):
                 parameter=[]
                 parameters(parameter)
                 start_time = time.time()  
-                processes=[multiprocessing.Process(target=Start,args=(i,G[i],allNodesInfected,allNodesSpreaders,GlobalRumorPopularity,parameter,Stat,percentage,K,timeOfTheRumorDetection,met))for i in range(len(G))] 
+                processes=[multiprocessing.Process(target=Start,args=(i,G[i],allNodesInfected,GlobalRumorPopularity,parameter,Stat,percentage,K,timeOfTheRumorDetection,met))for i in range(len(G))] 
                 
                 [process.start() for process in processes] 
                 [process.join() for process in processes]
                 end_time = time.time() 
                 print("Parallel xx time=", end_time - start_time)
-                globalStat(Stat,Stat_Global,parameter,met)
+                globalStat(Stat,Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,parameter,met)
             v+=1     
-        Display(Stat_Global,x,'np',Nodes)   #NBLS
+        Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,x,'np',Nodes)   #NBLS
 def Iterative():
     start_time = time.time()  
     StatI=[]
@@ -983,17 +1123,16 @@ if __name__ == '__main__':
     ytGraph=json_graph.node_link_graph(geneGraphs.txt2Graph("yt.txt"))
     twGraph=json_graph.node_link_graph(geneGraphs.txt2Graph("tw.txt"))
     ffGraph=json_graph.node_link_graph(geneGraphs.txt2Graph("ff.txt"))  
-    #print(g.nodes[12]['neighbors'])
 
-    G={"yt":ytGraph, "tw":twGraph, "ff":ffGraph} 
+    G={"yt":ytGraph, "tw":twGraph, "ff":ffGraph}
+    numberOfNetworks=3
     #G={"tw":twGraph} 
-    NumOFsumi=1
+    NumOFsumi=10
     G=[]
     for i in range(NumOFsumi):
       G.append(ytGraph)
       G.append(twGraph)
       G.append(ffGraph)
-
     Nodes=6407
     allNodesInfected={}
     static="Nodes :{},Edegs:{}."
@@ -1011,5 +1150,5 @@ if __name__ == '__main__':
   
 
     
-    simulation_strategy(1,  K, timeOfTheRumorDetection, ["NP"],G)
+    simulation_strategy(1,  K, timeOfTheRumorDetection, ["NP"],G,numberOfNetworks)
     plt.show()

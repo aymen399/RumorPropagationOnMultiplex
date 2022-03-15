@@ -405,8 +405,8 @@ def globalStat(S,Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,parameter,me
                 z[j][1].append(spreadersINetworks[j]/int(Len/3))
                 z[j][2].append(RPopularityINetworks[j]/int(Len/3))
         
-    GlobalStatYt.append({'Infected':z[1][0],'Spreaders':z[1][1],'RumorPopularity':z[1][2],'max':max,'method':method})
-    GlobalStatTw.append({'Infected':z[0][0],'Spreaders':z[0][1],'RumorPopularity':z[0][2],'max':max,'method':method})
+    GlobalStatYt.append({'Infected':z[0][0],'Spreaders':z[0][1],'RumorPopularity':z[0][2],'max':max,'method':method})
+    GlobalStatTw.append({'Infected':z[1][0],'Spreaders':z[1][1],'RumorPopularity':z[1][2],'max':max,'method':method})
     GlobalStatFf.append({'Infected':z[2][0],'Spreaders':z[2][1],'RumorPopularity':z[2][2],'max':max,'method':method})
     Stat_Global.append({'Infected':y1,'Spreaders':y2,'RumorPopularity':y3,'GlobalRumorPopularity':y8,'OpinionDenying':y4,'OpinionSupporting':y5, 'AllInfected':y6, 'parameter':parameter,'max':max,'method':method})       
     
@@ -651,7 +651,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for infected,j in zip( StatYt,range(len(StatYt))):
-            quotients = [number /663  for number in infected["Infected"]]
+            quotients = [number /Nodes  for number in infected["Infected"]]
             plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="red",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
@@ -667,7 +667,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for infected,j in zip( StatTw,range(len(StatTw))):
-            quotients = [number /5540  for number in infected["Infected"]]
+            quotients = [number /Nodes  for number in infected["Infected"]]
             plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="blue",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
@@ -683,7 +683,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for infected,j in zip( StatFf,range(len(StatFf))):
-            quotients = [number /5702  for number in infected["Infected"]]
+            quotients = [number /Nodes  for number in infected["Infected"]]
             plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="green",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
@@ -724,7 +724,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for Spreaders,j in zip( StatYt,range(len(StatYt))):
-            quotients = [number /663  for number in Spreaders["Spreaders"]]
+            quotients = [number /Nodes  for number in Spreaders["Spreaders"]]
             plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="red",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
@@ -740,7 +740,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for Spreaders,j in zip( StatTw,range(len(StatTw))):
-            quotients = [number /5540  for number in Spreaders["Spreaders"]]
+            quotients = [number /Nodes  for number in Spreaders["Spreaders"]]
             plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="blue",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
@@ -756,7 +756,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for Spreaders,j in zip( StatFf,range(len(StatFf))):
-            quotients = [number /5702  for number in Spreaders["Spreaders"]]
+            quotients = [number /Nodes  for number in Spreaders["Spreaders"]]
             plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="green",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
@@ -773,8 +773,11 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for infected,j in zip( Stat,range(len(Stat))):
-      quotients = [number /Nodes  for number in infected["GlobalRumorPopularity"]]
-      plt.plot(x, quotients,marker=type[j],markersize=6,linewidth=1,label=k.format(Title[j]))
+      quotients =[]
+      for i in range(0, len(infected["RumorPopularity"])-2, 3):
+          q = (infected["RumorPopularity"][i] + infected["RumorPopularity"][i+1] + infected["RumorPopularity"][i+2] ) / Nodes
+          quotients.append(q)
+      plt.plot(y, quotients,marker=type[j],markersize=6,linewidth=1,label=k.format(Title[j]))
     plt.legend(fontsize=12) 
     plt.xlabel('Temps')
     plt.ylabel('Nombre des individues')
@@ -788,7 +791,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for RumorPopularity,j in zip( StatYt,range(len(StatYt))):
-            quotients = [number /663  for number in RumorPopularity["RumorPopularity"]]
+            quotients = [number /Nodes  for number in RumorPopularity["RumorPopularity"]]
             plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="red",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
@@ -804,7 +807,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for RumorPopularity,j in zip( StatTw,range(len(StatTw))):
-            quotients = [number /5540 for number in RumorPopularity["RumorPopularity"]]
+            quotients = [number /Nodes for number in RumorPopularity["RumorPopularity"]]
             plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="blue",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
@@ -820,7 +823,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     #k="{}:{},{}]" 
     k="{}" 
     for RumorPopularity,j in zip( StatFf,range(len(StatFf))):
-            quotients = [number /5702  for number in RumorPopularity["RumorPopularity"]]
+            quotients = [number /Nodes  for number in RumorPopularity["RumorPopularity"]]
             plt.plot(x,quotients,marker=type[j],markersize=7,linewidth=1,color="green",label=k.format(Title[j]))
     plt.legend(fontsize=12)   
 
@@ -1127,7 +1130,7 @@ if __name__ == '__main__':
     G={"yt":ytGraph, "tw":twGraph, "ff":ffGraph}
     numberOfNetworks=3
     #G={"tw":twGraph} 
-    NumOFsumi=10
+    NumOFsumi=10 #for faster simulation choose: 5. for better results choose:500
     G=[]
     for i in range(NumOFsumi):
       G.append(ytGraph)

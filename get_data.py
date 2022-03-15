@@ -5,7 +5,7 @@ graphData = loadmat('MulNet.mat')
 #proof that friendfeed is directed: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.researchgate.net%2Ffigure%2FComparative-performances-on-FriendFeed-damp-ing-factor-depending-on-the-average-path_tbl9_265729958&psig=AOvVaw1QTIc9sX5GrBFkzqzobZPl&ust=1646661336214000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCMjBntfRsfYCFQAAAAAdAAAAABAD
 
 print(graphData.keys())
-print(graphData['NodeDegree'])
+print(graphData['NodesFeach'])
 '''
 for i in range(0, 6407):
 	for j in range(0, 3):

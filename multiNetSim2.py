@@ -77,8 +77,7 @@ def HISBmodel (Graph,graphTypeIndice,allNodesInfected,Opinion_Set,allOpinionSupo
       #add infection coming from the other networks
       for node in allNodesInfected:
         if not node in ListInfectedNodes:
-          ListInfectedNodes.append(node)
-          
+          ListInfectedNodes.append(node)  
       RumorPopularity = 0
       Nbr_Spreaders = 0
       L=len(ListInfectedNodes)
@@ -292,7 +291,7 @@ def graphe_TO_json(g):
     data['nodes'] = [ {"id": i,"state":"non_infected","Protector":"false","opinion":"normal","beta":0,"omega":0,"delta":0,"jug":0,"Infetime":0,"AccpR":0,"SendR":0,"Accp_NegR":0,"value":0,"blocked":'false',"degree":g.degree[i],"neighbors":[n for n in g.neighbors(i)]} for i in range(len(data['nodes'])) ]
     data['links'] = [ {"source":u,"target":v,"weight":(g.degree[u]+g.degree[v])/2} for u,v in g.edges ]
     return data
-def geneList_Infectede(allNodesInfected,Listopinion,N,percentage,denyingRation):
+def geneList_Infectede(allNodesInfected,Listopinion,N,percentage,denyingRatio):
     #10% of Popularity is infected
     #each simulation has its own infected list and opinions
     for i in range(len(allNodesInfected)):
@@ -306,7 +305,9 @@ def geneList_Infectede(allNodesInfected,Listopinion,N,percentage,denyingRation):
         Listopinion[i] = ['normal']*N
         for each in range(N):
             if each in allNodesInfected[i]:
-                if  opinion[each]<=denyingRation:
+                print("denyration: ", denyingRatio)
+                print("opinion[each]: ", opinion[each])
+                if  opinion[each]<=denyingRatio:
                     Listopinion[i][each]='denying'
                 else:
                     Listopinion[i][each]='supporting' 
@@ -699,7 +700,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     plt.ylabel('Nombre des individues')
     plt.title("infected in the whole popularity")
     plt.grid(True)
-    plt.savefig(title_fig+'infected.pdf',dpi=50)
+    plt.savefig('infected.pdf',dpi=50)
     
     ###################################################################################
      #Spreaders
@@ -733,7 +734,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     plt.title("Spreaders of the whole popularity")
     plt.xlabel('Temps')
     plt.ylabel('Nombre des individues')
-    plt.savefig(title_fig+'Spreaders.pdf',dpi=20)
+    plt.savefig('Spreaders.pdf',dpi=20)
 
     ##################################################################################
     # Global RumorPopularity
@@ -762,7 +763,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     plt.ylabel('Nombre des individues')
     plt.grid(True)
     plt.title("Global Rumor Popularity")
-    plt.savefig(title_fig+'RumorPopularity.pdf',dpi=20)
+    plt.savefig('RumorPopularity.pdf',dpi=20)
   
     ################################################################################### 
     # global opinion
@@ -782,7 +783,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     plt.xlabel('Temps')
     plt.ylabel('Nombre des individues')
     plt.title("Individuals Set Opinion")
-    plt.savefig('GlbalOpinion.pdf',dpi=20)
+    plt.savefig('GlobalOpinion.pdf',dpi=20)
  
     ################################################################################### 
     # opinion supporting
@@ -809,7 +810,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     plt.ylabel('Nombre des individues')
     plt.title("Rumor Supporting Nodes In the Multiplex")
     plt.grid(True)
-    plt.savefig(title_fig+'supportingOpinion.pdf',dpi=50)
+    plt.savefig('supportingOpinion.pdf',dpi=50)
  
     ###################################################################################
     # opinion denying
@@ -836,7 +837,7 @@ def Display(Stat_Global,GlobalStatYt,GlobalStatTw,GlobalStatFf,xx,title_fig,nb):
     plt.ylabel('Nombre des individues')
     plt.title("Rumor Denying Nodes In the Multiplex")
     plt.grid(True)
-    plt.savefig(title_fig+'supportingOpinion.pdf',dpi=50)
+    plt.savefig('denyingOpinion.pdf',dpi=50)
  
     ###################################################################################
     # Format the minor tick labels of the y-axis into empty strings with
@@ -922,7 +923,7 @@ def simulation_strategy(x,K,timeOfTheRumorDetection,method,G,numberOfNetworks,de
     #for each network in the multiplex
     geneList_Infectede(allNodesInfected,Listopinion,6407,percentage,denyingRation)    
     #print("after  call sets: ", allNodesInfected)
-    print("after     call oplists: ", Listopinion.count('supporting'))
+    print("after     call oplists: ", Listopinion)
     with Manager() as manager:
         Stat_Global=manager.list()
         GlobalStatYt=manager.list()
@@ -1144,7 +1145,7 @@ if __name__ == '__main__':
     G={"yt":ytGraph, "tw":twGraph, "ff":ffGraph}
     numberOfNetworks=3
     #G={"tw":twGraph} 
-    NumOFsumi=3 #for faster simulation choose: 5. for better results choose:500
+    NumOFsumi=10 #for faster simulation choose: 5. for better results choose:500
     G=[]
     for i in range(NumOFsumi):
       G.append(ytGraph)
@@ -1163,7 +1164,6 @@ if __name__ == '__main__':
     K=int(Nodes*0.2)
     print(K)
     timeOfTheRumorDetection=1
-    denyingRation=0.2
     
   
 
